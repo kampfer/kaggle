@@ -3,9 +3,12 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
 
 train_df = pd.read_csv('train.csv')
-test_df = pd.read_csv('test.csv')
+# test_df = pd.read_csv('test.csv')
 
 def transform_df(df):
     # 性别
@@ -61,5 +64,12 @@ def transform_df(df):
 
     return df
 
-print transform_df(train_df).head(), train_df.head()
+transformed_df = transform_df(train_df)
+# 首先将数据划分成训练集和测试集，再将训练集划分成训练集和验证集
+# 训练集 - 训练模型；验证集 - 调整超参数；测试机 - 选择模型
+x_train, x_test, y_train, y_test = train_test_split(transformed_df.drop('Survived', axis=1), transformed_df['Survived'], test_size=0.4, random_state=0)
+print x_train.shape, x_test.shape, y_train.shape, y_test.shape
 
+clf = svm.SVC(kernel='linear', C=1)
+scores = cross_val_score(clf, x_train, y_train, cv=10)
+print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
