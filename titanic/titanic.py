@@ -3,9 +3,17 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC, LinearSVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import Perceptron
+from sklearn.linear_model import SGDClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 train_df = pd.read_csv('train.csv')
 # test_df = pd.read_csv('test.csv')
@@ -70,6 +78,18 @@ transformed_df = transform_df(train_df)
 x_train, x_test, y_train, y_test = train_test_split(transformed_df.drop('Survived', axis=1), transformed_df['Survived'], test_size=0.4, random_state=0)
 print x_train.shape, x_test.shape, y_train.shape, y_test.shape
 
-clf = svm.SVC(kernel='linear', C=1)
-scores = cross_val_score(clf, x_train, y_train, cv=10)
-print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+# clf = svm.SVC(kernel='linear', C=1)
+clfs = {
+    'SVC': SVC(),
+    'LinearSVC': LinearSVC(),
+    'KNeighborsClassifier': KNeighborsClassifier(n_neighbors=3),
+    'LogisticRegression': LogisticRegression(),
+    'GaussianNB': GaussianNB(),
+    'Perceptron': Perceptron(),
+    'SGDClassifier': SGDClassifier(),
+    'DecisionTreeClassifier': DecisionTreeClassifier(),
+    'RandomForestClassifier': RandomForestClassifier(n_estimators=100)
+}
+for name, clf in clfs.iteritems():
+    scores = cross_val_score(clf, x_train, y_train, cv=10)
+    print("%s Accuracy: %0.2f (+/- %0.2f)" % (name, scores.mean(), scores.std() * 2))
