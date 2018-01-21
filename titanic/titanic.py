@@ -88,9 +88,7 @@ transformed_df = transform_df(train_df)
 # 首先将数据划分成训练集和测试集，再将训练集划分成训练集和验证集
 # 训练集 - 训练模型；验证集 - 调整超参数；测试机 - 选择模型
 x_train, x_test, y_train, y_test = train_test_split(transformed_df.drop('Survived', axis=1), transformed_df['Survived'], test_size=0.4, random_state=0)
-print x_train.shape, x_test.shape, y_train.shape, y_test.shape
 
-# clf = svm.SVC(kernel='linear', C=1)
 clfs = {
     'SVC': SVC(),
     'LinearSVC': LinearSVC(),
@@ -102,8 +100,22 @@ clfs = {
     'DecisionTreeClassifier': DecisionTreeClassifier(),
     'RandomForestClassifier': RandomForestClassifier(n_estimators=100)
 }
+'''
 for name, clf in clfs.iteritems():
     scores = cross_val_score(clf, x_train, y_train, cv=10)
     print("%s Accuracy: %0.2f (+/- %0.2f)" % (name, scores.mean(), scores.std() * 2))
+'''
 
-make_prediction(clfs['KNeighborsClassifier'])
+# 数据label不平衡，考虑使用
+'''
+划分训练集、验证集合、测试集的几点：
+1 shuffle 打乱样本次序
+2 stratified 保证集合中每类样本的比例基本一致
+3 group 需要对样本分组，按组划分
+4 time series
+'''
+
+test_clf = clfs['KNeighborsClassifier'].fit(x_train, y_train)
+print test_clf.score(x_test, y_test)
+
+# make_prediction(clfs['KNeighborsClassifier'])
