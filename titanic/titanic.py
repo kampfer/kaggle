@@ -72,6 +72,18 @@ def transform_df(df):
 
     return df
 
+def make_prediction(clf):
+    test_df = pd.read_csv('./test.csv')
+    train_df = pd.read_csv('./train.csv')
+    transformed_train_df = transform_df(train_df)
+    transformed_test_df = transform_df(test_df)
+    clf.fit(transformed_train_df.drop('Survived', axis=1), transformed_train_df['Survived'])
+    submission = pd.DataFrame({
+        'PassengerId': test_df['PassengerId'],
+        'Survived': clf.predict(transformed_test_df)
+    })
+    submission.to_csv('submission.csv', index=False)
+
 transformed_df = transform_df(train_df)
 # 首先将数据划分成训练集和测试集，再将训练集划分成训练集和验证集
 # 训练集 - 训练模型；验证集 - 调整超参数；测试机 - 选择模型
@@ -82,7 +94,7 @@ print x_train.shape, x_test.shape, y_train.shape, y_test.shape
 clfs = {
     'SVC': SVC(),
     'LinearSVC': LinearSVC(),
-    'KNeighborsClassifier': KNeighborsClassifier(n_neighbors=3),
+    'KNeighborsClassifier': KNeighborsClassifier(n_neighbors=5),
     'LogisticRegression': LogisticRegression(),
     'GaussianNB': GaussianNB(),
     'Perceptron': Perceptron(),
@@ -93,3 +105,5 @@ clfs = {
 for name, clf in clfs.iteritems():
     scores = cross_val_score(clf, x_train, y_train, cv=10)
     print("%s Accuracy: %0.2f (+/- %0.2f)" % (name, scores.mean(), scores.std() * 2))
+
+make_prediction(clfs['KNeighborsClassifier'])
