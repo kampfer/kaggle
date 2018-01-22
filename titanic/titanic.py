@@ -106,7 +106,6 @@ for name, clf in clfs.iteritems():
     print("%s Accuracy: %0.2f (+/- %0.2f)" % (name, scores.mean(), scores.std() * 2))
 '''
 
-# 数据label不平衡，考虑使用
 '''
 划分训练集、验证集合、测试集的几点：
 1 shuffle 打乱样本次序
